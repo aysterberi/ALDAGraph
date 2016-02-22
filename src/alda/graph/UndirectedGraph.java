@@ -21,8 +21,7 @@ public interface UndirectedGraph<T> {
     /**
      * Lägger till en ny nod i grafen.
      *
-     * @param newNode
-     *            datat för den nya noden som ska läggas till i grafen.
+     * @param newNode datat för den nya noden som ska läggas till i grafen.
      * @return false om noden redan finns.
      */
     boolean add(T newNode);
@@ -34,13 +33,10 @@ public interface UndirectedGraph<T> {
      * inte multigrafer. Om två noder försöks kopplas ihop som redan är
      * ihopkopplade uppdateras bara deras kostnadsfunktion.
      *
-     * @param node1
-     *            den ena noden.
-     * @param node2
-     *            den andra noden.
-     * @param cost
-     *            kostnaden för att ta sig mellan noderna. Denna måste vara >0
-     *            för att noderna ska kunna kopplas ihop.
+     * @param node1 den ena noden.
+     * @param node2 den andra noden.
+     * @param cost  kostnaden för att ta sig mellan noderna. Denna måste vara >0
+     *              för att noderna ska kunna kopplas ihop.
      * @return true om bägge noderna finns i grafen och kan kopplas ihop.
      */
     boolean connect(T node1, T node2, int cost);
@@ -48,10 +44,8 @@ public interface UndirectedGraph<T> {
     /**
      * Berättar om två noder är sammanbundan av en båge eller inte.
      *
-     * @param node1
-     *            den ena noden.
-     * @param node2
-     *            den andra noden.
+     * @param node1 den ena noden.
+     * @param node2 den andra noden.
      * @return om noderna är sammanbundna eller inte.
      */
     boolean isConnected(T node1, T node2);
@@ -59,41 +53,35 @@ public interface UndirectedGraph<T> {
     /**
      * Returnerar kostnaden för att ta sig mellan två noder.
      *
-     * @param node1
-     *            den ena noden.
-     * @param node2
-     *            den andra noden.
+     * @param node1 den ena noden.
+     * @param node2 den andra noden.
      * @return kostnaden för att ta sig mellan noderna eller -1 om noderna inte
-     *         är kopplade.
+     * är kopplade.
      */
     int getCost(T node1, T node2);
 
     /**
      * Gör en djupet-först-sökning efter en väg mellan två noder.
-     *
+     * <p>
      * Observera att denna metod inte använder sig av viktinformationen.
      *
-     * @param start
-     *            startnoden.
-     * @param end
-     *            slutnoden.
+     * @param start startnoden.
+     * @param end   slutnoden.
      * @return en lista över alla noder på vägen mellan start- och slutnoden. Om
-     *         ingen väg finns är listan tom.
+     * ingen väg finns är listan tom.
      */
     List<T> depthFirstSearch(T start, T end);
 
     /**
      * Gör en bredden-först-sökning efter en väg mellan två noder.
-     *
+     * <p>
      * Observera att denna metod inte använder sig av viktinformationen. Ni ska
      * alltså inte implementera Dijkstra eller A*.
      *
-     * @param start
-     *            startnoden.
-     * @param end
-     *            slutnoden.
+     * @param start startnoden.
+     * @param end   slutnoden.
      * @return en lista över alla noder på vägen mellan start- och slutnoden. Om
-     *         ingen väg finns är listan tom.
+     * ingen väg finns är listan tom.
      */
     List<T> breadthFirstSearch(T start, T end);
 
