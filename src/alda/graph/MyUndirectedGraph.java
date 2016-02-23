@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by Joakim on 2016-02-22.
  */
-public class MyUndirectedGraph<T> implements UndirectedGraph {
+public class MyUndirectedGraph<T extends Comparable<? super T>> implements UndirectedGraph {
 
     private Set<T> nodeSet = new HashSet<>();
     private ArrayList<Edge<T>> edgeList = new ArrayList<>();
@@ -31,24 +31,35 @@ public class MyUndirectedGraph<T> implements UndirectedGraph {
 
     @Override
     public boolean connect(Object node1, Object node2, int cost) {
-        Edge<T> edge = new Edge<>((T) node1, (T) node2, cost);
-        if (!nodeSet.contains((T) node1) || !nodeSet.contains((T) node2) || !(cost > 0)) {
-            return false;
-        }
-        for (Edge<T> e : edgeList) {
-            if ((e.one.equals(edge.one) || e.two.equals(edge.two)) && (e.two.equals(edge.one) || e.one.equals(edge.two))) {
-                return false;
+        if(nodeSet.contains(node1) && nodeSet.contains(node2)) {
+            if(cost > 0) {
+                if(!isConnected(node1, node2)) {
+                    Edge<T> edge = new Edge<>((T)node1, (T)node2, cost);
+                    edgeList.add(edge);
+                    return true;
+                } else if(isConnected(node1, node2)) {
+                    updateCost(node1, node2, cost);
+                    return true;
+                }
             }
         }
-        edgeList.add(edge);
-        return true;
+        return false;
+    }
+
+    private void updateCost(Object node1, Object node2, int cost) {
+        for(Edge<T> edge : edgeList) {
+            if(edge.oneNode == node1 && edge.anotherNode == node2 ||
+                    edge.oneNode == node2 && edge.anotherNode == node1) {
+                edge.weight = cost;
+            }
+        }
     }
 
     @Override
     public boolean isConnected(Object node1, Object node2) {
-        for (Edge<T> edge : edgeList) {
-            if ((edge.one.equals(node1) || edge.two.equals(node1)) &&
-                    (edge.one.equals(node2) || edge.two.equals(node2))) {
+        for(Edge<T> edge : edgeList) {
+            if(edge.oneNode == node1 && edge.anotherNode == node2 ||
+                    edge.oneNode == node2 && edge.anotherNode == node1) {
                 return true;
             }
         }
@@ -81,22 +92,22 @@ public class MyUndirectedGraph<T> implements UndirectedGraph {
     }
 
     class Edge<T> {
-        private T one;
-        private T two;
+        private T oneNode;
+        private T anotherNode;
         private int weight;
 
-        public Edge(T one, T two, int weight) {
-            this.one = one;
-            this.two = two;
+        public Edge(T oneNode, T anotherNode, int weight) {
+            this.oneNode = oneNode;
+            this.anotherNode = anotherNode;
             this.weight = weight;
         }
 
-        public T getOne() {
-            return one;
+        public T getOneNode() {
+            return oneNode;
         }
 
-        public T getTwo() {
-            return two;
+        public T getAnotherNode() {
+            return anotherNode;
         }
 
         public int getWeight() {
