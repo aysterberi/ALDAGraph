@@ -1,30 +1,47 @@
 package alda.graph;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Joakim on 2016-02-22.
  */
 public class MyUndirectedGraph<T> implements UndirectedGraph {
 
+    private Set<T> nodeSet = new HashSet<>();
+    private ArrayList<Edge<T>> edgeList = new ArrayList<>();
+
     @Override
     public int getNumberOfNodes() {
-        return 0;
+        return nodeSet.size();
     }
 
     @Override
     public int getNumberOfEdges() {
-        return 0;
+        return edgeList.size();
     }
 
     @Override
     public boolean add(Object newNode) {
-        return false;
+        if (nodeSet.contains(newNode)) {
+            return false;
+        }
+        nodeSet.add((T) newNode);
+        return true;
     }
 
     @Override
     public boolean connect(Object node1, Object node2, int cost) {
-        return false;
+        Edge<T> edge = new Edge<>((T)node1, (T)node2, cost);
+        if(!nodeSet.contains((T)node1) || !nodeSet.contains((T)node2) || !(cost > 0)) {
+            return false;
+        } else if(edgeList.contains(edge)) {
+            return false;
+        }
+        edgeList.add(edge);
+        return true;
     }
 
     @Override
@@ -50,5 +67,17 @@ public class MyUndirectedGraph<T> implements UndirectedGraph {
     @Override
     public UndirectedGraph minimumSpanningTree() {
         return null;
+    }
+
+    class Edge<T> {
+        private T one;
+        private T two;
+        private int weight;
+
+        public Edge(T one, T two, int weight) {
+            this.one = one;
+            this.two = two;
+            this.weight = weight;
+        }
     }
 }
