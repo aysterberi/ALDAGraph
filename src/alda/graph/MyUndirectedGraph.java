@@ -32,18 +32,6 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean connect(T node1, T node2, int weight) {
-        if(nodeExist(node1) && nodeExist(node2)) {
-            if(weight > 0) {
-                if(!edgeExist(node1, node2)) {
-                    Edge<T> edge = new Edge<>(new Node<T>(node1), new Node<>(node2), weight);
-                    edgeList.add(edge);
-                    return true;
-                } else if(edgeExist(node1, node2)) {
-                    updateCost(node1, node2, weight);
-                    return true;
-                }
-            }
-        }
         return false;
     }
 
@@ -98,9 +86,6 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public List<T> depthFirstSearch(T start, T end) {
-        Queue<T> queue = new LinkedList<>();
-        Set<T> checked = new HashSet<>();
-        queue.add(start);
         return null;
     }
 
@@ -155,5 +140,4 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
             }
         }
     }
-
 }
