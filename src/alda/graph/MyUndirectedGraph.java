@@ -35,28 +35,27 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean connect(T node1, T node2, int weight) {
+        if (weight <= 0)
+        {
+            return false;
+        }
         //undvik multigraf, dvs, flera kanter med samma
         //noder
         for(Edge<T> e : edgeList)
         {
             if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2)))
             {
-                return false;
+                if(e.weight != weight)
+                {
+                    e.weight = weight; //uppdatera vikt ifall redan finns
+                    return true;
+                }
+                return false; //if weight unchanged
             }
         }
-
-        //fattar inte weight
-        //vi ska ju ha assertFalse vid
-        //testConnects rad 2,3
-        Node<T> tnode1 = new Node<>(node1);
-        Node<T> tnode2 = new Node<>(node2);
-        //om HashMap, leta upp noderna med data node1,node2
-        //link i en ny Edge?
-        //annars skapar vi endast fler noder?
-        //
-        Edge<T> edge = new Edge<>(tnode1, tnode2, weight);
-        //some kind of weight check?
-
+        Node<T> firstnode = nodeMap.get(node1);
+        Node<T> secondnode = nodeMap.get(node2);
+        Edge<T> edge = new Edge<>(firstnode, secondnode, weight);
         edgeList.add(edge);
         return true;
         }
