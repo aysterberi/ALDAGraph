@@ -6,6 +6,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     private Set<Node<T>> nodeSet = new HashSet<>();
     private ArrayList<Edge<T>> edgeList = new ArrayList<>();
+    private Map<T, Node<T>> nodeMap = new HashMap<>();
 
     public MyUndirectedGraph() {}
 
@@ -20,20 +21,45 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     }
 
     @Override
-    public boolean add(T newNode) {
+    public boolean add(T newNodeData) {
         for(Node<T> node : nodeSet) {
-            if (node.data.equals(newNode)) {
-                return false; //Kanske en HashMap med K = data, V = node?
-            } //tror inte jag helt fattat men ska man inte adda en edge?
+            if (node.data.equals(newNodeData)) {
+                return false;
+            }
         }
-        nodeSet.add(new Node<T>(newNode));
+        Node<T> aNode = new Node<>(newNodeData);
+        nodeSet.add(aNode);
+        nodeMap.put(newNodeData, aNode);
         return true;
     }
 
     @Override
     public boolean connect(T node1, T node2, int weight) {
-        return false;
-    }
+        //undvik multigraf, dvs, flera kanter med samma
+        //noder
+        for(Edge<T> e : edgeList)
+        {
+            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2)))
+            {
+                return false;
+            }
+        }
+
+        //fattar inte weight
+        //vi ska ju ha assertFalse vid
+        //testConnects rad 2,3
+        Node<T> tnode1 = new Node<>(node1);
+        Node<T> tnode2 = new Node<>(node2);
+        //om HashMap, leta upp noderna med data node1,node2
+        //link i en ny Edge?
+        //annars skapar vi endast fler noder?
+        //
+        Edge<T> edge = new Edge<>(tnode1, tnode2, weight);
+        //some kind of weight check?
+
+        edgeList.add(edge);
+        return true;
+        }
 
     public boolean nodeExist(T oneNode) {
         for(Node<T> node : nodeSet) {
