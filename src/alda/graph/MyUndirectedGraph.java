@@ -56,8 +56,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
         Node<T> firstnode = nodeMap.get(node1);
         Node<T> secondnode = nodeMap.get(node2);
-        Edge<T> edge = new Edge<>(firstnode, secondnode, weight);
-        edgeList.add(edge);
+        Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
+        edgeList.add(tEdge);
         return true;
     }
 
@@ -71,7 +71,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     }
 
     public boolean edgeExist(T oneNode, T anotherNode) {
-        //TODO: no idea why it doesn't work
+
         for (Edge<T> edge : edgeList) {
             if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
                     edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
@@ -83,6 +83,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean isConnected(T oneNode, T anotherNode) {
+        //TODO: no idea why it doesn't work
         for (Edge<T> edge : edgeList) {
             if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.equals(anotherNode) ||
                     edge.oneNode.equals(anotherNode) && edge.anotherNode.equals(oneNode)) {
