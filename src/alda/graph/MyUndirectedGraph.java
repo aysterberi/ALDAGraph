@@ -2,10 +2,12 @@ package alda.graph;
 
 import java.util.*;
 
-public class MyUndirectedGraph<T extends Comparable<? super T>> implements UndirectedGraph<T> {
+public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     private Set<Node<T>> nodeSet = new HashSet<>();
     private ArrayList<Edge<T>> edgeList = new ArrayList<>();
+
+    public MyUndirectedGraph() {}
 
     @Override
     public int getNumberOfNodes() {
@@ -30,13 +32,13 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
 
     @Override
     public boolean connect(T node1, T node2, int weight) {
-        if(nodeSet.contains(node1) && nodeSet.contains(node2)) {
+        if(nodeExist(node1) && nodeExist(node2)) {
             if(weight > 0) {
-                if(!isConnected(node1, node2)) {
-                    Edge<T> edge = new Edge<>(node1, node2, weight);
+                if(!edgeExist(node1, node2)) {
+                    Edge<T> edge = new Edge<>(new Node<T>(node1), new Node<>(node2), weight);
                     edgeList.add(edge);
                     return true;
-                } else if(isConnected(node1, node2)) {
+                } else if(edgeExist(node1, node2)) {
                     updateCost(node1, node2, weight);
                     return true;
                 }
@@ -45,24 +47,43 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
         return false;
     }
 
-    private void updateCost(T node1, T node2, int weight) {
-        for(Edge<T> edge : edgeList) {
-            if(edge.oneNode == node1 && edge.anotherNode == node2 ||
-                    edge.oneNode == node2 && edge.anotherNode == node1) {
-                edge.weight = weight;
-            }
-        }
-    }
-
-    @Override
-    public boolean isConnected(T node1, T node2) {
-        for(Edge<T> edge : edgeList) {
-            if(edge.oneNode == node1 && edge.anotherNode == node2 ||
-                    edge.oneNode == node2 && edge.anotherNode == node1) {
+    public boolean nodeExist(T oneNode) {
+        for(Node<T> node : nodeSet) {
+            if(node.data.equals(oneNode)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean edgeExist(T oneNode, T anotherNode) {
+        for(Edge<T> edge : edgeList) {
+            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+                    edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isConnected(T oneNode, T anotherNode) {
+        for(Edge<T> edge : edgeList) {
+            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.equals(anotherNode) ||
+                    edge.oneNode.equals(anotherNode) && edge.anotherNode.equals(oneNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateCost(T oneNode, T anotherNode, int weight) {
+        for(Edge<T> edge : edgeList) {
+            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+                    edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
+                edge.weight = weight;
+            }
+        }
     }
 
     @Override
@@ -93,25 +114,45 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
         return null;
     }
 
-    class Edge<T> {
-        private T oneNode;
-        private T anotherNode;
+    class Edge<T> implements Comparable<Edge<T>> {
+        private Node<T> oneNode;
+        private Node<T> anotherNode;
         private int weight;
 
-        public Edge(T oneNode, T anotherNode, int weight) {
+        public Edge(Node<T> oneNode, Node<T> anotherNode, int weight) {
             this.oneNode = oneNode;
             this.anotherNode = anotherNode;
             this.weight = weight;
         }
+
+        @Override
+        public int compareTo(Edge<T> other) {
+            if(other.weight < weight) {
+                return 1;
+            } else if(other.weight > weight) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
     }
 
-    class Node<T> {
+    class Node<T> implements Comparable<Node<T>> {
         private T data;
         private boolean visited;
 
         public Node(T data) {
             this.data = data;
             visited = false;
+        }
+
+        @Override
+        public int compareTo(Node<T> other) {
+            if(other.data.equals(data)) {
+                return 0;
+            } else {
+                return -1;
+            }
         }
     }
 
