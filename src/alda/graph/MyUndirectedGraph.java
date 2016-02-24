@@ -23,8 +23,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     public boolean add(T newNode) {
         for(Node<T> node : nodeSet) {
             if (node.data.equals(newNode)) {
-                return false;
-            }
+                return false; //Kanske en HashMap med K = data, V = node?
+            } //tror inte jag helt fattat men ska man inte adda en edge?
         }
         nodeSet.add(new Node<T>(newNode));
         return true;
