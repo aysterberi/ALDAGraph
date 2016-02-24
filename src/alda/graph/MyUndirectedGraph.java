@@ -8,7 +8,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     private ArrayList<Edge<T>> edgeList = new ArrayList<>();
     private Map<T, Node<T>> nodeMap = new HashMap<>();
 
-    public MyUndirectedGraph() {}
+    public MyUndirectedGraph() {
+    }
 
     @Override
     public int getNumberOfNodes() {
@@ -22,7 +23,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean add(T newNodeData) {
-        for(Node<T> node : nodeSet) {
+        for (Node<T> node : nodeSet) {
             if (node.data.equals(newNodeData)) {
                 return false;
             }
@@ -35,34 +36,34 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean connect(T node1, T node2, int weight) {
-        if (weight <= 0)
-        {
+        if (weight <= 0) {
+            return false;
+        }
+        if (!nodeMap.containsKey(node1) && !nodeMap.containsKey(node2)) {
             return false;
         }
         //undvik multigraf, dvs, flera kanter med samma
         //noder
-        for(Edge<T> e : edgeList)
-        {
-            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2)))
-            {
-                if(e.weight != weight)
-                {
+        for (Edge<T> e : edgeList) {
+            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2))) {
+                if (e.weight != weight) {
                     e.weight = weight; //uppdatera vikt ifall redan finns
                     return true;
                 }
                 return false; //if weight unchanged
             }
         }
+
         Node<T> firstnode = nodeMap.get(node1);
         Node<T> secondnode = nodeMap.get(node2);
         Edge<T> edge = new Edge<>(firstnode, secondnode, weight);
         edgeList.add(edge);
         return true;
-        }
+    }
 
     public boolean nodeExist(T oneNode) {
-        for(Node<T> node : nodeSet) {
-            if(node.data.equals(oneNode)) {
+        for (Node<T> node : nodeSet) {
+            if (node.data.equals(oneNode)) {
                 return true;
             }
         }
@@ -70,8 +71,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     }
 
     public boolean edgeExist(T oneNode, T anotherNode) {
-        for(Edge<T> edge : edgeList) {
-            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+        for (Edge<T> edge : edgeList) {
+            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
                     edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
                 return true;
             }
@@ -81,8 +82,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean isConnected(T oneNode, T anotherNode) {
-        for(Edge<T> edge : edgeList) {
-            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.equals(anotherNode) ||
+        for (Edge<T> edge : edgeList) {
+            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.equals(anotherNode) ||
                     edge.oneNode.equals(anotherNode) && edge.anotherNode.equals(oneNode)) {
                 return true;
             }
@@ -91,8 +92,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     }
 
     private void updateCost(T oneNode, T anotherNode, int weight) {
-        for(Edge<T> edge : edgeList) {
-            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+        for (Edge<T> edge : edgeList) {
+            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
                     edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
                 edge.weight = weight;
             }
@@ -137,9 +138,9 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
         @Override
         public int compareTo(Edge<T> other) {
-            if(other.weight < weight) {
+            if (other.weight < weight) {
                 return 1;
-            } else if(other.weight > weight) {
+            } else if (other.weight > weight) {
                 return -1;
             } else {
                 return 0;
@@ -158,7 +159,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
         @Override
         public int compareTo(Node<T> other) {
-            if(other.data.equals(data)) {
+            if (other.data.equals(data)) {
                 return 0;
             } else {
                 return -1;
