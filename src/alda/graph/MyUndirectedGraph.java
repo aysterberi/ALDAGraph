@@ -2,12 +2,9 @@ package alda.graph;
 
 import java.util.*;
 
-/**
- * Created by Joakim on 2016-02-22.
- */
 public class MyUndirectedGraph<T extends Comparable<? super T>> implements UndirectedGraph<T> {
 
-    private Set<T> nodeSet = new HashSet<>();
+    private Set<Node<T>> nodeSet = new HashSet<>();
     private ArrayList<Edge<T>> edgeList = new ArrayList<>();
 
     @Override
@@ -22,10 +19,12 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
 
     @Override
     public boolean add(T newNode) {
-        if (nodeSet.contains(newNode)) {
-            return false;
+        for(Node<T> node : nodeSet) {
+            if (node.data.equals(newNode)) {
+                return false;
+            }
         }
-        nodeSet.add((T) newNode);
+        nodeSet.add(new Node<T>(newNode));
         return true;
     }
 
@@ -34,7 +33,7 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
         if(nodeSet.contains(node1) && nodeSet.contains(node2)) {
             if(weight > 0) {
                 if(!isConnected(node1, node2)) {
-                    Edge<T> edge = new Edge<>((T)node1, (T)node2, weight);
+                    Edge<T> edge = new Edge<>(node1, node2, weight);
                     edgeList.add(edge);
                     return true;
                 } else if(isConnected(node1, node2)) {
@@ -46,7 +45,7 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
         return false;
     }
 
-    private void updateCost(Object node1, Object node2, int weight) {
+    private void updateCost(T node1, T node2, int weight) {
         for(Edge<T> edge : edgeList) {
             if(edge.oneNode == node1 && edge.anotherNode == node2 ||
                     edge.oneNode == node2 && edge.anotherNode == node1) {
@@ -80,17 +79,17 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
     public List<T> depthFirstSearch(T start, T end) {
         Queue<T> queue = new LinkedList<>();
         Set<T> checked = new HashSet<>();
-        queue.add((T)start);
+        queue.add(start);
         return null;
     }
 
     @Override
-    public List breadthFirstSearch(T start, T end) {
+    public List<T> breadthFirstSearch(T start, T end) {
         return null;
     }
 
     @Override
-    public UndirectedGraph minimumSpanningTree() {
+    public UndirectedGraph<T> minimumSpanningTree() {
         return null;
     }
 
@@ -103,6 +102,16 @@ public class MyUndirectedGraph<T extends Comparable<? super T>> implements Undir
             this.oneNode = oneNode;
             this.anotherNode = anotherNode;
             this.weight = weight;
+        }
+    }
+
+    class Node<T> {
+        private T data;
+        private boolean visited;
+
+        public Node(T data) {
+            this.data = data;
+            visited = false;
         }
     }
 
