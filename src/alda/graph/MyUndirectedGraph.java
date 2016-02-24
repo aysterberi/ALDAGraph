@@ -39,7 +39,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         if (weight <= 0) {
             return false;
         }
-        if (!nodeMap.containsKey(node1) && !nodeMap.containsKey(node2)) {
+        if (!nodeMap.containsKey(node1) || !nodeMap.containsKey(node2)) {
             return false;
         }
         //undvik multigraf, dvs, flera kanter med samma
@@ -71,6 +71,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     }
 
     public boolean edgeExist(T oneNode, T anotherNode) {
+        //TODO: no idea why it doesn't work
         for (Edge<T> edge : edgeList) {
             if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
                     edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
