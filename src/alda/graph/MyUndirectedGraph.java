@@ -63,15 +63,6 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         return true;
     }
 
-    public boolean nodeExist(T oneNode) {
-        for (Node<T> node : nodeSet) {
-            if (node.data.equals(oneNode)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean edgeExist(T oneNode, T anotherNode) {
 
         for (Edge<T> edge : edgeList) {
@@ -85,27 +76,16 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean isConnected(T oneNode, T anotherNode) {
-        boolean nodeConnected = false;
-        //TODO: no idea why it doesn't work
-        for (Edge<T> edge : edgeList) {
-            if (edgeContains(edge, oneNode, anotherNode)) {
-                nodeConnected = true;
-                break;
-            } else {
-                nodeConnected = false;
-                break;
-            }
+        if(!nodeMap.containsKey(oneNode) || !nodeMap.containsKey(anotherNode)) {
+            return false;
         }
-        return nodeConnected;
-    }
-
-    private void updateCost(T oneNode, T anotherNode, int weight) {
-        for (Edge<T> edge : edgeList) {
-            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+        for(Edge<T> edge : edgeList) {
+            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
                     edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
-                edge.weight = weight;
+                return true;
             }
         }
+        return false;
     }
 
     private boolean edgeContains(Edge<T> edge, T data, T data2) {
@@ -161,7 +141,6 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
         LinkedList<T> queue = new LinkedList<>();
         LinkedList<T> result = new LinkedList<>();
-        LinkedList<T> strangeList = new LinkedList<>();
         queue.addLast(start);
         nodeMap.get(start).visited = true;
 
@@ -188,16 +167,6 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         result.addLast(end);
         result.addFirst(start);
         return result;
-    }
-
-    // TODO: Den här metoden kan vara mycket enklare
-    private boolean getNodeDataFromNeighbor(Node<T> node, T end) {
-        for (T n : node.neighbors) {
-            if (n.equals(end)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
