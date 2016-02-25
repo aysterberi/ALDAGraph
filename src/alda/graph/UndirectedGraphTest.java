@@ -145,7 +145,7 @@ public class UndirectedGraphTest {
 
     @Test
     public void testDepthFirstSearchFromFToF() {
-        testDepthFirstSearch("F", "E", 1);
+        testDepthFirstSearch("F", "F", 1);
     }
 
     private void testBreadthFirstSearch(String start, String end, int expectedathLength) {

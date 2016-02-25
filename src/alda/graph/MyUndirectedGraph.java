@@ -53,32 +53,13 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
                 return false; //if weight unchanged
             }
         }
-
         Node<T> firstnode = nodeMap.get(node1);
         Node<T> secondnode = nodeMap.get(node2);
         Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
         edgeList.add(tEdge);
+        nodeMap.get(node1).neighbors.add(secondnode);
+        nodeMap.get(node2).neighbors.add(firstnode);
         return true;
-    }
-
-    public boolean nodeExist(T oneNode) {
-        for (Node<T> node : nodeSet) {
-            if (node.data.equals(oneNode)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean edgeExist(T oneNode, T anotherNode) {
-
-        for (Edge<T> edge : edgeList) {
-            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
-                    edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -101,19 +82,19 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         return nodeConnected;
     }
 
-    private void updateCost(T oneNode, T anotherNode, int weight) {
-        for (Edge<T> edge : edgeList) {
-            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
-                    edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
-                edge.weight = weight;
-            }
+    private boolean edgeContains(Edge<T> edge, T data, T data2) {
+        if (edge.oneNode.data.equals(data) && edge.anotherNode.data.equals(data2)) {
+            return true;
+        } else if (edge.oneNode.data.equals(data2) && edge.anotherNode.data.equals(data)) {
+            return true;
         }
+        return false;
     }
 
     @Override
     public int getCost(T node1, T node2) {
         for (Edge<T> edge : edgeList) {
-            if (isConnected(node1, node2)) {
+            if (edgeContains(edge, node1, node2)) {
                 return edge.weight;
             }
         }
@@ -122,12 +103,45 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public List<T> depthFirstSearch(T start, T end) {
+        Stack<T> stack = new Stack<>();
         return null;
     }
 
     @Override
     public List<T> breadthFirstSearch(T start, T end) {
-        return null;
+        // TODO: Jag är något på spåren här
+        if(!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
+            return null;
+        }
+
+        LinkedList<T> queue = new LinkedList<>();
+        queue.addLast(start);
+        if(start.equals(end)) {
+            return queue;
+        }
+        nodeMap.get(start).visited = true;
+
+        while(!queue.isEmpty()) {
+            T data = queue.removeFirst();
+            for(Node<T> node : nodeMap.get(data).neighbors) { //TODO: something something dark side
+                if(!node.visited && !node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
+                    node.visited = true;
+                    queue.addLast(node.data);
+                } else if(node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
+                    break;
+                }
+            }
+        }
+        return queue;
+    }
+    // TODO: Den här metoden kan vara mycket enklare
+    private boolean getNodeDataFromNeighbor(Node<T> node, T end) {
+        for(Node<T> n : node.neighbors) {
+            if(n.data.equals(end)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -160,11 +174,13 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     class Node<T> implements Comparable<Node<T>> {
         private T data;
+        private Set<Node<T>> neighbors;
         private boolean visited;
 
         public Node(T data) {
             this.data = data;
             visited = false;
+            neighbors = new HashSet<>();
         }
 
         @Override
