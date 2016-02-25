@@ -53,13 +53,32 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
                 return false; //if weight unchanged
             }
         }
+
         Node<T> firstnode = nodeMap.get(node1);
         Node<T> secondnode = nodeMap.get(node2);
         Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
         edgeList.add(tEdge);
-        nodeMap.get(node1).neighbors.add(secondnode);
-        nodeMap.get(node2).neighbors.add(firstnode);
         return true;
+    }
+
+    public boolean nodeExist(T oneNode) {
+        for (Node<T> node : nodeSet) {
+            if (node.data.equals(oneNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean edgeExist(T oneNode, T anotherNode) {
+
+        for (Edge<T> edge : edgeList) {
+            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+                    edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -67,11 +86,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         boolean nodeConnected = false;
         //TODO: no idea why it doesn't work
         for (Edge<T> edge : edgeList) {
-            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode)) {
-                nodeConnected = true;
-                break;
-            }
-            if (edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
+            if (edgeContains(edge, oneNode, anotherNode)) {
                 nodeConnected = true;
                 break;
             } else {
@@ -80,6 +95,15 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
             }
         }
         return nodeConnected;
+    }
+
+    private void updateCost(T oneNode, T anotherNode, int weight) {
+        for (Edge<T> edge : edgeList) {
+            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+                    edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
+                edge.weight = weight;
+            }
+        }
     }
 
     private boolean edgeContains(Edge<T> edge, T data, T data2) {
@@ -103,8 +127,30 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public List<T> depthFirstSearch(T start, T end) {
-        Stack<T> stack = new Stack<>();
-        return null;
+        Set<Node<T>> visited = new HashSet<>();
+        depthFirstSearch(nodeMap.get(start), visited);
+        List<T> results = new ArrayList<>();
+        for(Node<T> n : visited)
+        {
+            results.add(n.data);
+        }
+        return results;
+    }
+
+    private void depthFirstSearch(Node<T> from, Set<Node<T>> visited) {
+        visited.add(from);
+        for (Edge<T> e : edgeList) {
+            Node<T> tmp = null;
+
+            if (e.oneNode.equals(from) || e.anotherNode.equals(from))
+            {
+                tmp = e.oneNode.equals(from) ? e.anotherNode: e.oneNode;
+            }
+            if(!visited.contains(tmp))
+            {
+                depthFirstSearch(tmp, visited);
+            }
+        }
     }
 
     @Override
