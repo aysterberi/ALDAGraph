@@ -154,13 +154,14 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public List<T> breadthFirstSearch(T start, T end) {
-        // TODO: Jag är något på spåren här
+        T temp = end;
         if (!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
             return null;
         }
 
         LinkedList<T> queue = new LinkedList<>();
         LinkedList<T> result = new LinkedList<>();
+        LinkedList<T> strangeList = new LinkedList<>();
         queue.addLast(start);
         nodeMap.get(start).visited = true;
 
@@ -170,57 +171,22 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
         while(!queue.isEmpty()) {
             T data = queue.removeFirst();
+            for(T t : nodeMap.get(data).neighbors) {
+                if(nodeMap.get(t).previous == null) {
+                    nodeMap.get(t).previous = data;
+                }
+                if(!nodeMap.get(t).visited) {
+                    queue.addLast(t);
+                }
+                nodeMap.get(t).visited = true;
+            }
         }
-
-//            for(T t : nodeMap.get(data).neighbors) { //TODO: Denna metod var närmast. Men väljer fel previous
-//                if(!t.equals(start)) {
-//                    nodeMap.get(t).previous = data;
-//                }
-//                if(!nodeMap.get(t).visited) {
-//                    nodeMap.get(t).visited = true;
-//                    queue.addLast(t);
-//                }
-//                if(t.equals(end)) {
-//                    result.addFirst(end);
-//                    while(nodeMap.get(t).previous != null) {
-//                        result.addFirst(nodeMap.get(t).previous);
-//                        t = nodeMap.get(t).previous;
-//                    }
-//                    return result;
-//                }
-//            }
-//        }
-
-//        nodeMap.get(start).visited = true;
-//        while(!queue.isEmpty()) {
-//            T data = queue.removeFirst();
-//            for(T t : nodeMap.get(data).neighbors) {
-//                node.previous = new Node<>(data);
-//                queue.addLast(node.data);
-//                if(!node.visited) {
-//                    node.visited = true;
-//                } else if(node.data.equals(end)) {
-//                    while(node.previous != null) {
-//                        result.addFirst(node.previous.data);
-//                        node = node.previous;
-//                    }
-//                }
-//            }
-//        }
-
-//        nodeMap.get(start).visited = true;
-//
-//        while (!queue.isEmpty()) {
-//            T data = queue.removeFirst();
-//            for (Node<T> node : nodeMap.get(data).neighbors) { //TODO: something something dark side
-//                if (!node.visited && !node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
-//                    node.visited = true;
-//                    queue.addLast(node.data);
-//                } else if (node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
-//                    break;
-//                }
-//            }
-//        }
+        while(!nodeMap.get(temp).previous.equals(start)) {
+                result.addFirst(nodeMap.get(temp).previous);
+                temp = nodeMap.get(temp).previous;
+        }
+        result.addLast(end);
+        result.addFirst(start);
         return result;
     }
 
