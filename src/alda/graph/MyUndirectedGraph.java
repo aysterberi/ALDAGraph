@@ -44,23 +44,21 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         }
         //undvik multigraf, dvs, flera kanter med samma
         //noder
-        for (Edge<T> e : edgeList) {
-            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2)) || e.oneNode.data.equals(node2) && e.anotherNode.data.equals(node1)) {
-                if (e.weight != weight) {
-                    e.weight = weight; //uppdatera vikt ifall redan finns
-                    return true;
-                }
-                return false; //if weight unchanged
-            }
+        if (edgeExist(node1, node2)) {
+            Edge<T> ed = getEdge(node1, node2);
+            ed.weight = weight;
+            return true;
         }
-
-        Node<T> firstnode = nodeMap.get(node1);
-        Node<T> secondnode = nodeMap.get(node2);
-        Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
-        edgeList.add(tEdge);
-        secondnode.neighbors.add(node1);
-        firstnode.neighbors.add(node2);
-        return true;
+        if (!edgeExist(node1, node2)) {
+            Node<T> firstnode = nodeMap.get(node1);
+            Node<T> secondnode = nodeMap.get(node2);
+            Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
+            edgeList.add(tEdge);
+            secondnode.neighbors.add(node1);
+            firstnode.neighbors.add(node2);
+            return true;
+        }
+        return false;
     }
 
     public boolean edgeExist(T oneNode, T anotherNode) {
@@ -74,13 +72,23 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         return false;
     }
 
+    private Edge<T> getEdge(T node1, T node2) {
+        for (Edge<T> e : edgeList) {
+            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals(node2) ||
+                    e.oneNode.data.equals(node2) && e.anotherNode.data.equals(node1)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean isConnected(T oneNode, T anotherNode) {
-        if(!nodeMap.containsKey(oneNode) || !nodeMap.containsKey(anotherNode)) {
+        if (!nodeMap.containsKey(oneNode) || !nodeMap.containsKey(anotherNode)) {
             return false;
         }
-        for(Edge<T> edge : edgeList) {
-            if(edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
+        for (Edge<T> edge : edgeList) {
+            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode) ||
                     edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
                 return true;
             }
@@ -88,7 +96,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         return false;
     }
 
-    private boolean edgeContains(Edge<T> edge, T data, T data2) {
+    public boolean edgeContains(Edge<T> edge, T data, T data2) {
         if (edge.oneNode.data.equals(data) && edge.anotherNode.data.equals(data2)) {
             return true;
         } else if (edge.oneNode.data.equals(data2) && edge.anotherNode.data.equals(data)) {
@@ -109,31 +117,50 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public List<T> depthFirstSearch(T start, T end) {
-        Set<Node<T>> visited = new HashSet<>();
-        depthFirstSearch(nodeMap.get(start), visited);
-        List<T> results = new ArrayList<>();
-        for (Node<T> n : visited) {
-            results.add(n.data);
+        if (start == null) {
+            return null;
         }
-        return results;
+        T temp = end;
+        if (!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
+            return null;
+        }
+
+        LinkedList<T> stack = new LinkedList<>();
+        LinkedList<T> result = new LinkedList<>();
+        stack.addLast(start);
+        nodeMap.get(start).visited = true;
+
+        if (start.equals(end)) {
+            return stack;
+        }
+
+        while (!stack.isEmpty()) {
+            T data = stack.removeLast(); //DFS is like BFS but stack > queue
+            for (T t : nodeMap.get(data).neighbors) {
+                if (nodeMap.get(t).previous == null) {
+                    nodeMap.get(t).previous = data;
+                }
+                if (!nodeMap.get(t).visited) {
+                    stack.addLast(t);
+                }
+                nodeMap.get(t).visited = true;
+            }
+        }
+        while (!nodeMap.get(temp).previous.equals(start)) {
+            result.addFirst(nodeMap.get(temp).previous);
+            temp = nodeMap.get(temp).previous;
+        }
+        result.addLast(end);
+        result.addFirst(start);
+        return result;
     }
 
-    private void depthFirstSearch(Node<T> from, Set<Node<T>> visited) {
-        visited.add(from);
-        for (Edge<T> e : edgeList) {
-            Node<T> tmp = null;
-
-            if (e.oneNode.equals(from) || e.anotherNode.equals(from)) {
-                tmp = e.oneNode.equals(from) ? e.anotherNode : e.oneNode;
-            }
-            if (!visited.contains(tmp)) {
-                depthFirstSearch(tmp, visited);
-            }
-        }
-    }
 
     @Override
     public List<T> breadthFirstSearch(T start, T end) {
+        if (start == null) {
+            return null;
+        }
         T temp = end;
         if (!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
             return null;
@@ -148,21 +175,21 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
             return queue;
         }
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             T data = queue.removeFirst();
-            for(T t : nodeMap.get(data).neighbors) {
-                if(nodeMap.get(t).previous == null) {
+            for (T t : nodeMap.get(data).neighbors) {
+                if (nodeMap.get(t).previous == null) {
                     nodeMap.get(t).previous = data;
                 }
-                if(!nodeMap.get(t).visited) {
+                if (!nodeMap.get(t).visited) {
                     queue.addLast(t);
                 }
                 nodeMap.get(t).visited = true;
             }
         }
-        while(!nodeMap.get(temp).previous.equals(start)) {
-                result.addFirst(nodeMap.get(temp).previous);
-                temp = nodeMap.get(temp).previous;
+        while (!nodeMap.get(temp).previous.equals(start)) {
+            result.addFirst(nodeMap.get(temp).previous);
+            temp = nodeMap.get(temp).previous;
         }
         result.addLast(end);
         result.addFirst(start);
@@ -171,7 +198,19 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public UndirectedGraph<T> minimumSpanningTree() {
-        return null;
+        //Kruskal's algo?
+        SortedSet<Edge<T>> sortedEdges = new TreeSet<>(edgeList);
+        UndirectedGraph<T> S = new MyUndirectedGraph<>();
+        for (Edge<T> e : sortedEdges) {
+            T ta = e.oneNode.data;
+            T tb = e.anotherNode.data;
+            if (!S.isConnected(ta, tb)) {
+                S.add(ta);
+                S.add(tb);
+                S.connect(ta, tb, e.weight);
+            }
+        }
+        return S;
     }
 
     class Edge<T> implements Comparable<Edge<T>> {
