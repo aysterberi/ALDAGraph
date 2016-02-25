@@ -58,6 +58,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         Node<T> secondnode = nodeMap.get(node2);
         Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
         edgeList.add(tEdge);
+        secondnode.neighbors.add(node1);
+        firstnode.neighbors.add(node2);
         return true;
     }
 
@@ -130,8 +132,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         Set<Node<T>> visited = new HashSet<>();
         depthFirstSearch(nodeMap.get(start), visited);
         List<T> results = new ArrayList<>();
-        for(Node<T> n : visited)
-        {
+        for (Node<T> n : visited) {
             results.add(n.data);
         }
         return results;
@@ -142,12 +143,10 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         for (Edge<T> e : edgeList) {
             Node<T> tmp = null;
 
-            if (e.oneNode.equals(from) || e.anotherNode.equals(from))
-            {
-                tmp = e.oneNode.equals(from) ? e.anotherNode: e.oneNode;
+            if (e.oneNode.equals(from) || e.anotherNode.equals(from)) {
+                tmp = e.oneNode.equals(from) ? e.anotherNode : e.oneNode;
             }
-            if(!visited.contains(tmp))
-            {
+            if (!visited.contains(tmp)) {
                 depthFirstSearch(tmp, visited);
             }
         }
@@ -156,34 +155,79 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     @Override
     public List<T> breadthFirstSearch(T start, T end) {
         // TODO: Jag är något på spåren här
-        if(!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
+        if (!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
             return null;
         }
 
         LinkedList<T> queue = new LinkedList<>();
+        LinkedList<T> result = new LinkedList<>();
         queue.addLast(start);
-        if(start.equals(end)) {
+        nodeMap.get(start).visited = true;
+
+        if (start.equals(end)) {
             return queue;
         }
-        nodeMap.get(start).visited = true;
 
         while(!queue.isEmpty()) {
             T data = queue.removeFirst();
-            for(Node<T> node : nodeMap.get(data).neighbors) { //TODO: something something dark side
-                if(!node.visited && !node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
-                    node.visited = true;
-                    queue.addLast(node.data);
-                } else if(node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
-                    break;
-                }
-            }
         }
-        return queue;
+
+//            for(T t : nodeMap.get(data).neighbors) { //TODO: Denna metod var närmast. Men väljer fel previous
+//                if(!t.equals(start)) {
+//                    nodeMap.get(t).previous = data;
+//                }
+//                if(!nodeMap.get(t).visited) {
+//                    nodeMap.get(t).visited = true;
+//                    queue.addLast(t);
+//                }
+//                if(t.equals(end)) {
+//                    result.addFirst(end);
+//                    while(nodeMap.get(t).previous != null) {
+//                        result.addFirst(nodeMap.get(t).previous);
+//                        t = nodeMap.get(t).previous;
+//                    }
+//                    return result;
+//                }
+//            }
+//        }
+
+//        nodeMap.get(start).visited = true;
+//        while(!queue.isEmpty()) {
+//            T data = queue.removeFirst();
+//            for(T t : nodeMap.get(data).neighbors) {
+//                node.previous = new Node<>(data);
+//                queue.addLast(node.data);
+//                if(!node.visited) {
+//                    node.visited = true;
+//                } else if(node.data.equals(end)) {
+//                    while(node.previous != null) {
+//                        result.addFirst(node.previous.data);
+//                        node = node.previous;
+//                    }
+//                }
+//            }
+//        }
+
+//        nodeMap.get(start).visited = true;
+//
+//        while (!queue.isEmpty()) {
+//            T data = queue.removeFirst();
+//            for (Node<T> node : nodeMap.get(data).neighbors) { //TODO: something something dark side
+//                if (!node.visited && !node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
+//                    node.visited = true;
+//                    queue.addLast(node.data);
+//                } else if (node.neighbors.contains(getNodeDataFromNeighbor(node, end))) {
+//                    break;
+//                }
+//            }
+//        }
+        return result;
     }
+
     // TODO: Den här metoden kan vara mycket enklare
     private boolean getNodeDataFromNeighbor(Node<T> node, T end) {
-        for(Node<T> n : node.neighbors) {
-            if(n.data.equals(end)) {
+        for (T n : node.neighbors) {
+            if (n.equals(end)) {
                 return true;
             }
         }
@@ -220,13 +264,15 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     class Node<T> implements Comparable<Node<T>> {
         private T data;
-        private Set<Node<T>> neighbors;
+        private Set<T> neighbors;
+        private T previous;
         private boolean visited;
 
         public Node(T data) {
             this.data = data;
             visited = false;
             neighbors = new HashSet<>();
+            previous = null;
         }
 
         @Override
