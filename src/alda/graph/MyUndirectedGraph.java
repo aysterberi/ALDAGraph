@@ -84,13 +84,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
     @Override
     public boolean isConnected(T oneNode, T anotherNode) {
         boolean nodeConnected = false;
-        //TODO: no idea why it doesn't work
         for (Edge<T> edge : edgeList) {
-            if (edge.oneNode.data.equals(oneNode) && edge.anotherNode.data.equals(anotherNode)) {
-                nodeConnected = true;
-                break;
-            }
-            if (edge.oneNode.data.equals(anotherNode) && edge.anotherNode.data.equals(oneNode)) {
+            if (edgeContains(edge, oneNode, anotherNode)) {
                 nodeConnected = true;
                 break;
             } else {
@@ -110,23 +105,19 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         }
     }
 
-    private boolean edgeContains(Edge<T> edge, T data, T data2)
-    {
-        if (edge.oneNode.data.equals(data) && edge.anotherNode.data.equals(data2))
-        {
+    private boolean edgeContains(Edge<T> edge, T data, T data2) {
+        if (edge.oneNode.data.equals(data) && edge.anotherNode.data.equals(data2)) {
             return true;
-        }
-        else if (edge.oneNode.data.equals(data2) && edge.anotherNode.data.equals(data))
-        {
+        } else if (edge.oneNode.data.equals(data2) && edge.anotherNode.data.equals(data)) {
             return true;
         }
         return false;
     }
+
     @Override
     public int getCost(T node1, T node2) {
         for (Edge<T> edge : edgeList) {
-            if (edgeContains(edge, node1, node2))
-            {
+            if (edgeContains(edge, node1, node2)) {
                 return edge.weight;
             }
         }
@@ -135,7 +126,30 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public List<T> depthFirstSearch(T start, T end) {
-        return null;
+        Set<Node<T>> visited = new HashSet<>();
+        depthFirstSearch(nodeMap.get(start), visited);
+        List<T> results = new ArrayList<>();
+        for(Node<T> n : visited)
+        {
+            results.add(n.data);
+        }
+        return results;
+    }
+
+    private void depthFirstSearch(Node<T> from, Set<Node<T>> visited) {
+        visited.add(from);
+        for (Edge<T> e : edgeList) {
+            Node<T> tmp = null;
+
+            if (e.oneNode.equals(from) || e.anotherNode.equals(from))
+            {
+                tmp = e.oneNode.equals(from) ? e.anotherNode: e.oneNode;
+            }
+            if(!visited.contains(tmp))
+            {
+                depthFirstSearch(tmp, visited);
+            }
+        }
     }
 
     @Override
