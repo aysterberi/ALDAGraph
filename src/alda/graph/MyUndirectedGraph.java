@@ -45,7 +45,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         //undvik multigraf, dvs, flera kanter med samma
         //noder
         for (Edge<T> e : edgeList) {
-            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2))) {
+            if (e.oneNode.data.equals(node1) && e.anotherNode.data.equals((node2)) || e.oneNode.data.equals(node2) && e.anotherNode.data.equals(node1)) {
                 if (e.weight != weight) {
                     e.weight = weight; //uppdatera vikt ifall redan finns
                     return true;
