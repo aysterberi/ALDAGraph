@@ -110,10 +110,23 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         }
     }
 
+    private boolean edgeContains(Edge<T> edge, T data, T data2)
+    {
+        if (edge.oneNode.data.equals(data) && edge.anotherNode.data.equals(data2))
+        {
+            return true;
+        }
+        else if (edge.oneNode.data.equals(data2) && edge.anotherNode.data.equals(data))
+        {
+            return true;
+        }
+        return false;
+    }
     @Override
     public int getCost(T node1, T node2) {
         for (Edge<T> edge : edgeList) {
-            if (isConnected(node1, node2)) {
+            if (edgeContains(edge, node1, node2))
+            {
                 return edge.weight;
             }
         }
