@@ -1,3 +1,8 @@
+/**
+ * Billy G. J. Beltran(bibe1744) & Joakim Berglund(jobe7147)
+ * Contact details: billy@caudimordax.org, joakimberglund@live.se
+ */
+
 package alda.graph;
 
 import java.util.*;
@@ -21,7 +26,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean add(T newNodeData) {
-        if(nodeMap.containsKey(newNodeData)) {
+        if (nodeMap.containsKey(newNodeData)) {
             return false;
         }
         Node<T> aNode = new Node<>(newNodeData);
@@ -112,12 +117,24 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         return -1;
     }
 
+    private boolean allNeighborsVisited(T data) {
+        for (T t : nodeMap.get(data).neighbors) {
+            if (!nodeMap.get(t).visited) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public List<T> depthFirstSearch(T start, T end) {
+        for (T t : nodeMap.keySet()) {
+            nodeMap.get(t).visited = false;
+        }
         if (start == null) {
             return null;
         }
-        T temp = end;
+        T data = start;
         if (!nodeMap.containsKey(start) && !nodeMap.containsKey(end)) {
             return null;
         }
@@ -130,25 +147,25 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         if (start.equals(end)) {
             return stack;
         }
-
         while (!stack.isEmpty()) {
-            T data = stack.pop(); //DFS is like BFS but stack > queue
-            for (T t : nodeMap.get(data).neighbors) {
-                if (nodeMap.get(t).previous == null) {
-                    nodeMap.get(t).previous = data;
+            if (allNeighborsVisited(stack.peek()) && !stack.peek().equals(end)) {
+                stack.pop();
+            } else {
+                for(T t : nodeMap.get(data).neighbors) {
+                    if(!nodeMap.get(t).visited && isConnected(nodeMap.get(t).data, nodeMap.get(data).data)) {
+                        nodeMap.get(t).visited = true;
+                        stack.push(t);
+                    }
+                    data = stack.peek();
                 }
-                if (!nodeMap.get(t).visited) {
-                    stack.push(t);
-                }
-                nodeMap.get(t).visited = true;
+            }
+            if (stack.peek().equals(end)) {
+                break;
             }
         }
-        while (!nodeMap.get(temp).previous.equals(start)) {
-            result.addFirst(nodeMap.get(temp).previous);
-            temp = nodeMap.get(temp).previous;
+        while (!stack.isEmpty()) {
+            result.addFirst(stack.pop());
         }
-        result.addLast(end);
-        result.addFirst(start);
         return result;
     }
 
