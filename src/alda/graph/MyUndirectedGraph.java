@@ -198,19 +198,43 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public UndirectedGraph<T> minimumSpanningTree() {
-        //Kruskal's algo?
-        SortedSet<Edge<T>> sortedEdges = new TreeSet<>(edgeList);
-        UndirectedGraph<T> S = new MyUndirectedGraph<>();
-        for (Edge<T> e : sortedEdges) {
+        //Kruskals algoritm
+        ArrayList<Edge<T>> sortedEdges = new ArrayList<>(); //vi ska inte mecka med gamla grafen
+        Collections.sort(edgeList);
+        sortedEdges.addAll(edgeList); //var PQ
+        HashMap<Node<T>, Set<Node<T>>> forest = new HashMap<>();
+        //skapa en skog for varje nod
+        for (Node<T> node : nodeSet) {
+            Set<Node<T>> ns = new HashSet<>();
+            ns.add(node);
+            forest.put(node, ns);
+        }
+        List<Edge<T>> minSpanTree = new ArrayList<>();
+        while (true) {
+            Edge<T> check = sortedEdges.remove(0); //anvand som en priority queue
+
+            //besok noderna
+            Set<Node<T>> visited1 = forest.get(check.anotherNode);
+            Set<Node<T>> visited2 = forest.get(check.oneNode);
+            if (visited1.equals(visited2))
+                continue;
+            minSpanTree.add(check);
+            visited1.addAll(visited2);
+            for (Node<T> t : visited1) {
+                forest.put(t, visited1);
+            }
+            if (visited1.size() == nodeSet.size()) //vi har alla noder
+                break;
+        }
+        MyUndirectedGraph minSpanTreeGraph = new MyUndirectedGraph(); //bygg upp ny graf
+        for (Edge<T> e : minSpanTree) {
             T ta = e.oneNode.data;
             T tb = e.anotherNode.data;
-            if (!S.isConnected(ta, tb)) {
-                S.add(ta);
-                S.add(tb);
-                S.connect(ta, tb, e.weight);
-            }
+            minSpanTreeGraph.add(ta);
+            minSpanTreeGraph.add(tb);
+            minSpanTreeGraph.connect(ta, tb, e.weight);
         }
-        return S;
+        return minSpanTreeGraph;
     }
 
     class Edge<T> implements Comparable<Edge<T>> {
