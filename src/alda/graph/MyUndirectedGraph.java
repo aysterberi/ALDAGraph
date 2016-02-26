@@ -21,10 +21,8 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean add(T newNodeData) {
-        for (T t : nodeMap.keySet()) {
-            if (nodeMap.get(t).data.equals(newNodeData)) {
-                return false;
-            }
+        if(nodeMap.containsKey(newNodeData)) {
+            return false;
         }
         Node<T> aNode = new Node<>(newNodeData);
         nodeMap.put(newNodeData, aNode);
