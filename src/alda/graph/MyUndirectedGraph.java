@@ -3,8 +3,6 @@ package alda.graph;
 import java.util.*;
 
 public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
-
-    private Set<Node<T>> nodeSet = new HashSet<>();
     private ArrayList<Edge<T>> edgeList = new ArrayList<>();
     private Map<T, Node<T>> nodeMap = new HashMap<>();
 
@@ -13,7 +11,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public int getNumberOfNodes() {
-        return nodeSet.size();
+        return nodeMap.size();
     }
 
     @Override
@@ -23,13 +21,12 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
 
     @Override
     public boolean add(T newNodeData) {
-        for (Node<T> node : nodeSet) {
-            if (node.data.equals(newNodeData)) {
+        for (T t : nodeMap.keySet()) {
+            if (nodeMap.get(t).data.equals(newNodeData)) {
                 return false;
             }
         }
         Node<T> aNode = new Node<>(newNodeData);
-        nodeSet.add(aNode);
         nodeMap.put(newNodeData, aNode);
         return true;
     }
@@ -45,17 +42,19 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         //undvik multigraf, dvs, flera kanter med samma
         //noder
         if (edgeExist(node1, node2)) {
-            Edge<T> ed = getEdge(node1, node2);
-            ed.weight = weight;
+            Edge<T> edge = getEdge(node1, node2);
+            if (edge != null) {
+                edge.weight = weight;
+            }
             return true;
         }
         if (!edgeExist(node1, node2)) {
-            Node<T> firstnode = nodeMap.get(node1);
-            Node<T> secondnode = nodeMap.get(node2);
-            Edge<T> tEdge = new Edge<>(firstnode, secondnode, weight);
+            Node<T> firstNode = nodeMap.get(node1);
+            Node<T> secondNode = nodeMap.get(node2);
+            Edge<T> tEdge = new Edge<>(firstNode, secondNode, weight);
             edgeList.add(tEdge);
-            secondnode.neighbors.add(node1);
-            firstnode.neighbors.add(node2);
+            secondNode.neighbors.add(node1);
+            firstNode.neighbors.add(node2);
             return true;
         }
         return false;
@@ -125,9 +124,9 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
             return null;
         }
 
-        LinkedList<T> stack = new LinkedList<>();
+        Stack<T> stack = new Stack<>();
         LinkedList<T> result = new LinkedList<>();
-        stack.addLast(start);
+        stack.push(start);
         nodeMap.get(start).visited = true;
 
         if (start.equals(end)) {
@@ -135,13 +134,13 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         }
 
         while (!stack.isEmpty()) {
-            T data = stack.removeLast(); //DFS is like BFS but stack > queue
+            T data = stack.pop(); //DFS is like BFS but stack > queue
             for (T t : nodeMap.get(data).neighbors) {
                 if (nodeMap.get(t).previous == null) {
                     nodeMap.get(t).previous = data;
                 }
                 if (!nodeMap.get(t).visited) {
-                    stack.addLast(t);
+                    stack.push(t);
                 }
                 nodeMap.get(t).visited = true;
             }
@@ -204,10 +203,10 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
         sortedEdges.addAll(edgeList); //var PQ
         HashMap<Node<T>, Set<Node<T>>> forest = new HashMap<>();
         //skapa en skog for varje nod
-        for (Node<T> node : nodeSet) {
+        for (T t : nodeMap.keySet()) {
             Set<Node<T>> ns = new HashSet<>();
-            ns.add(node);
-            forest.put(node, ns);
+            ns.add(nodeMap.get(t));
+            forest.put(nodeMap.get(t), ns);
         }
         List<Edge<T>> minSpanTree = new ArrayList<>();
         while (true) {
@@ -223,7 +222,7 @@ public class MyUndirectedGraph<T> implements UndirectedGraph<T> {
             for (Node<T> t : visited1) {
                 forest.put(t, visited1);
             }
-            if (visited1.size() == nodeSet.size()) //vi har alla noder
+            if (visited1.size() == nodeMap.size()) //vi har alla noder
                 break;
         }
         MyUndirectedGraph minSpanTreeGraph = new MyUndirectedGraph(); //bygg upp ny graf
